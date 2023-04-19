@@ -17,7 +17,7 @@ module.exports = {
         "customBlack": "rgba(0, 0, 0, 0.6)",
         "green300": '#00b37e',
         "green500": '#00875f',
-
+        "grayIcon": "#202024",
       },
       backgroundImage: {
         'gradient-radial': 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
