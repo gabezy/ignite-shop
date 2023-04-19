@@ -28,59 +28,61 @@ export default function Home({ products }: HomeProps) {
     },
   });
   if (isFallback) {
-    return <p>Loading...</p>
+    return <p>Loading...</p>;
   }
   return (
-    <div
-      ref={sliderRef}
-      className="flex w-full max-w-[calc(100vw-((100vw-1180px)/2))] ml-auto min-h-homeCard keen-slider"
-    >
+    <>
       <Head>
-        <title>Ignite Shop | Home</title>
+        <title>Home | Ignite Shop</title>
       </Head>
-      /*
-      <button
-        className="absolute left-[-100px] top-1/2 p-2 cursor-pointer hover:bg-red-500"
-        onClick={() => console.log("prev")}
+      <div
+        ref={sliderRef}
+        className="flex w-full max-w-[calc(100vw-((100vw-1180px)/2))] ml-auto min-h-homeCard keen-slider"
       >
-        <Image src={leftArrow.src} width={48} height={48} alt="" />
-      </button>
-      <button
-        className="absolute z-10 right-0 top-1/2 bottom-1/2 p-2 cursor-pointer"
-        onClick={() => instanceRef.current?.next}
-      >
-        <Image src={RightArrow.src} width={48} height={48} alt="" />
-      </button>
-      */
-      {products.map((product) => {
-        return (
-          <Link
-            key={product.id}
-            href={`/product/${product.id}`}
-            className="relative"
-            prefetch={false}
-          >
-            <div className="bg-gradient-radial rounded-lg p-1 cursor-pointer relative flex items-center justify-center w-[690px] h-[656px] group overflow-hidden keen-slider__slide">
-              <Image
-                src={product.imageUrl}
-                blurDataURL={product.imageUrl}
-                placeholder="blur"
-                width={520}
-                height={480}
-                alt=""
-                className="object-cover"
-              />
-              <footer className="absolute bottom-1 left-1 right-1 rounded-md flex p-8 items-center justify-between bg-customBlack  translate-y-1/4 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
-                <strong className="text-xl text-white">{product.name}</strong>
-                <span className="text-2xl font-bold text-green300">
-                  {product.price}
-                </span>
-              </footer>
-            </div>
-          </Link>
-        );
-      })}
-    </div>
+        /*
+        <button
+          className="absolute left-[-100px] top-1/2 p-2 cursor-pointer hover:bg-red-500"
+          onClick={() => console.log("prev")}
+        >
+          <Image src={leftArrow.src} width={48} height={48} alt="" />
+        </button>
+        <button
+          className="absolute z-10 right-0 top-1/2 bottom-1/2 p-2 cursor-pointer"
+          onClick={() => instanceRef.current?.next}
+        >
+          <Image src={RightArrow.src} width={48} height={48} alt="" />
+        </button>
+        */
+        {products.map((product) => {
+          return (
+            <Link
+              key={product.id}
+              href={`/product/${product.id}`}
+              className="relative"
+              prefetch={false}
+            >
+              <div className="bg-gradient-radial rounded-lg p-1 cursor-pointer relative flex items-center justify-center w-[690px] h-[656px] group overflow-hidden keen-slider__slide">
+                <Image
+                  src={product.imageUrl}
+                  blurDataURL={product.imageUrl}
+                  placeholder="blur"
+                  width={520}
+                  height={480}
+                  alt=""
+                  className="object-cover"
+                />
+                <footer className="absolute bottom-1 left-1 right-1 rounded-md flex p-8 items-center justify-between bg-customBlack  translate-y-1/4 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
+                  <strong className="text-xl text-white">{product.name}</strong>
+                  <span className="text-2xl font-bold text-green300">
+                    {product.price}
+                  </span>
+                </footer>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
