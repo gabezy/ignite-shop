@@ -5,6 +5,10 @@ import { stripe } from "@/lib/stripe";
 import { GetStaticProps } from "next";
 import Stripe from "stripe";
 import Link from "next/link";
+import leftArrow from "../assets/left-arrow.svg";
+import RightArrow from "../assets/right-arrow.svg";
+import { useRouter } from "next/router";
+import Head from "next/head";
 
 interface HomeProps {
   products: {
@@ -16,24 +20,47 @@ interface HomeProps {
 }
 
 export default function Home({ products }: HomeProps) {
-  const [sliderRef] = useKeenSlider({
+  const { isFallback } = useRouter();
+  const [sliderRef, instanceRef] = useKeenSlider({
     slides: {
       perView: 3,
       spacing: 48,
     },
   });
-
+  if (isFallback) {
+    return <p>Loading...</p>
+  }
   return (
     <div
       ref={sliderRef}
-      className="flex  w-full max-w-[calc(100vw-((100vw-1180px)/2))] ml-auto min-h-homeCard keen-slider"
+      className="flex w-full max-w-[calc(100vw-((100vw-1180px)/2))] ml-auto min-h-homeCard keen-slider"
     >
+      <Head>
+        <title>Ignite Shop | Home</title>
+      </Head>
+      /*
+      <button
+        className="absolute left-[-100px] top-1/2 p-2 cursor-pointer hover:bg-red-500"
+        onClick={() => console.log("prev")}
+      >
+        <Image src={leftArrow.src} width={48} height={48} alt="" />
+      </button>
+      <button
+        className="absolute z-10 right-0 top-1/2 bottom-1/2 p-2 cursor-pointer"
+        onClick={() => instanceRef.current?.next}
+      >
+        <Image src={RightArrow.src} width={48} height={48} alt="" />
+      </button>
+      */
       {products.map((product) => {
         return (
-          <Link key={product.id} href={`/product/${product.id}`}>
-            <div
-              className="bg-gradient-radial rounded-lg p-1 cursor-pointer relative flex items-center justify-center w-[690px] h-[656px] group overflow-hidden keen-slider__slide"
-            >
+          <Link
+            key={product.id}
+            href={`/product/${product.id}`}
+            className="relative"
+            prefetch={false}
+          >
+            <div className="bg-gradient-radial rounded-lg p-1 cursor-pointer relative flex items-center justify-center w-[690px] h-[656px] group overflow-hidden keen-slider__slide">
               <Image
                 src={product.imageUrl}
                 blurDataURL={product.imageUrl}

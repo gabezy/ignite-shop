@@ -1,9 +1,11 @@
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { stripe } from "@/lib/stripe";
 import Stripe from "stripe";
-import { useRouter } from "next/router";
+import "react-loading-skeleton/dist/skeleton.css";
+import Head from "next/head";
+import axios from "axios";
 
 interface ProductProps {
   product: {
@@ -12,18 +14,38 @@ interface ProductProps {
     description: string;
     imageUrl: string;
     price: string;
+    defaultPriceId: string;
   };
 }
 
 export default function Product({ product }: ProductProps) {
-  const {isFallback} = useRouter()
 
-  if (isFallback) {
-    return <p className="text-white">loading...</p>
-  }
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
   
+  //const router = useRouter(); internal url
+
+   const handleBuyProduct = async () => {
+    try {
+      setIsCreatingCheckoutSession(true)
+      const response = await axios.post("/api/checkout", {
+        priceId: product.defaultPriceId,
+      })
+      const {checkoutUrl} = response.data;
+
+      window.location.href = checkoutUrl; // external url
+      // router.push("/checkout") send to internal url
+    } catch (err) {
+      // connect to a observer tool (Datadog/ Sentry)
+      alert("Falha ao redirecionar ao checkout!");
+      setIsCreatingCheckoutSession(false)
+    }
+  }
+
   return (
     <div className="grid grid-cols-2 items-stretch gap-[72px] justify-center max-w-custom mx-auto">
+      <Head>
+        <title>{`Ignite Shop | ${product.name}`}</title>
+      </Head>
       <div className="flex items-center justify-center bg-gradient-radial rounded-lg w-[576px] h-[calc(656px-0.5rem)]">
         <Image
           src={product.imageUrl}
@@ -39,7 +61,11 @@ export default function Product({ product }: ProductProps) {
         <h1 className="text-gray300 text-4xl font-bold mb-4">{product.name}</h1>
         <span className="text-green500 text-4xl mb-10">{product.price}</span>
         <p className="text-gray100 text-lg">{product.description}</p>
-        <button className="mt-auto border-0 bg-green500 text-center py-5 rounded-lg text-white text-lg font-bold cursor-pointer hover:bg-green300 transition-colors">
+        <button 
+          className="mt-auto border-0 bg-green500 text-center py-5 rounded-lg text-white text-lg font-bold cursor-pointer not:hover:bg-green300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          disabled={isCreatingCheckoutSession}
+          onClick={handleBuyProduct}
+        >
           Comprar agora
         </button>
       </div>
@@ -50,13 +76,15 @@ export default function Product({ product }: ProductProps) {
 export const getStaticPaths: GetStaticPaths = async () => {
   const products = await stripe.products.list();
 
-  const ids = products.data.map((product) => {
-    return {
-      params: {
-        id: product.id,
-      },
-    };
-  }).slice(0, 1);
+  const ids = products.data
+    .map((product) => {
+      return {
+        params: {
+          id: product.id,
+        },
+      };
+    })
+    .slice(0, 1);
 
   return {
     paths: ids,
@@ -86,6 +114,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
         name: product.name,
         description: product.description,
         imageUrl: product.images[0],
+        defaultPriceId: price.id, 
         price:
           price.unit_amount != null
             ? new Intl.NumberFormat("pt-BR", {
