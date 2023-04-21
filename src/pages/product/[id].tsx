@@ -1,45 +1,31 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { stripe } from "@/lib/stripe";
 import Stripe from "stripe";
 import "react-loading-skeleton/dist/skeleton.css";
 import Head from "next/head";
-import axios from "axios";
+import { ProductContext } from "@/context/products-context";
 
-interface ProductProps {
-  product: {
-    id: string;
-    name: string;
-    description: string;
-    imageUrl: string;
-    price: string;
-    defaultPriceId: string;
-  };
+export interface ProductProps {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  price: string;
+  defaultPriceId: string;
 }
 
-export default function Product({ product }: ProductProps) {
+interface StripeResponseProps {
+  product: ProductProps;
+}
 
-  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
-  
-  //const router = useRouter(); internal url
+export default function Product({ product }: StripeResponseProps) {
+  const { addNewProduct } = useContext(ProductContext);
 
-   const handleBuyProduct = async () => {
-    try {
-      setIsCreatingCheckoutSession(true)
-      const response = await axios.post("/api/checkout", {
-        priceId: product.defaultPriceId,
-      })
-      const {checkoutUrl} = response.data;
-
-      window.location.href = checkoutUrl; // external url
-      // router.push("/checkout") send to internal url
-    } catch (err) {
-      // connect to a observer tool (Datadog/ Sentry)
-      alert("Falha ao redirecionar ao checkout!");
-      setIsCreatingCheckoutSession(false)
-    }
-  }
+  const handleAddNewProduct = () => {
+    addNewProduct(product);
+  };
 
   return (
     <div className="grid grid-cols-2 items-stretch gap-[72px] justify-center max-w-custom mx-auto">
@@ -61,10 +47,9 @@ export default function Product({ product }: ProductProps) {
         <h1 className="text-gray300 text-4xl font-bold mb-4">{product.name}</h1>
         <span className="text-green500 text-4xl mb-10">{product.price}</span>
         <p className="text-gray100 text-lg">{product.description}</p>
-        <button 
+        <button
           className="mt-auto border-0 bg-green500 text-center py-5 rounded-lg text-white text-lg font-bold cursor-pointer not:hover:bg-green300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          disabled={isCreatingCheckoutSession}
-          onClick={handleBuyProduct}
+          onClick={handleAddNewProduct}
         >
           Comprar agora
         </button>
@@ -114,7 +99,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
         name: product.name,
         description: product.description,
         imageUrl: product.images[0],
-        defaultPriceId: price.id, 
+        defaultPriceId: price.id,
         price:
           price.unit_amount != null
             ? new Intl.NumberFormat("pt-BR", {
