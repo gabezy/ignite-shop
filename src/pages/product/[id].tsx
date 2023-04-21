@@ -58,7 +58,7 @@ export default function Product({ product }: StripeResponseProps) {
             </span>
             <p className="text-gray100 text-lg">{product.description}</p>
             <button
-              className="mt-auto border-0 bg-green500 text-center py-5 rounded-lg text-white text-lg font-bold cursor-pointer not:hover:bg-green300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="mt-auto border-0 bg-green500 text-center py-5 rounded-lg text-white text-lg font-bold cursor-pointer hover:bg-green300 transition-colorsd"
               onClick={handleAddNewProduct}
             >
               Comprar agora
