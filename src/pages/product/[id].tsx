@@ -33,7 +33,7 @@ export default function Product({ product }: StripeResponseProps) {
   return (
     <>
       <Head>
-        <title>{`Ignite Shop | ${product.name}`}</title>
+        <title>{`${product.name} | Ignite Shop`}</title>
       </Head>
       {isFallback && <SkeletonLoadingProduct />}
       {!isFallback && (
