@@ -22,7 +22,7 @@ export default function Home({ products }: HomeProps) {
   const { isFallback } = useRouter();
   const [sliderRef, instanceRef] = useKeenSlider({
     slides: {
-      perView: 3,
+      perView: 2.5,
       spacing: 48,
     },
   });
@@ -33,7 +33,7 @@ export default function Home({ products }: HomeProps) {
       </Head>
       <div
         ref={sliderRef}
-        className="flex w-full max-w-[calc(100vw-((100vw-1180px)/2))] ml-auto min-h-homeCard keen-slider"
+        className="flex w-full max-w-[calc(100vw-((100vw-1180px)/2))] ml-auto min-h-homeCard keen-slider overflow-hidden"
       >
         {isFallback && (
           <div className="flex gap-4">
