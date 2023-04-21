@@ -8,13 +8,13 @@ import Stripe from "stripe";
 
 interface CheckoutProps {
   customerName: string;
-  product: {
+  products: {
     name: string;
     imageUrl: string;
-  };
+  }[];
 }
 
-export default function Sucess({ customerName, product }: CheckoutProps) {
+export default function Sucess({ customerName, products }: CheckoutProps) {
   return (
     <>
       <Head>
@@ -25,22 +25,31 @@ export default function Sucess({ customerName, product }: CheckoutProps) {
         <h1 className="text-4xl text-gray100 font-bold mt-10 mb-16">
           Compra efetuada!
         </h1>
-        <div className="flex justify-center items-center w-[127px] h-[145px] bg-gradient-radial rounded-lg mb-8">
-          <Image
-            className="object-cover"
-            src={product.imageUrl}
-            alt=""
-            width={115}
-            height={106}
-          />
+        <div className="flex">
+          {products.map((product) => {
+            return (
+              <div
+                key={product.name}
+                className="flex justify-center items-center w-[140px] h-[140px] bg-gradient-radial rounded-full mb-8"
+              >
+                <Image
+                  className="object-cover"
+                  src={product.imageUrl}
+                  alt=""
+                  width={130}
+                  height={132}
+                />
+              </div>
+            );
+          })}
         </div>
-        <p className="text-gray300 text-2xl max-w-[40ch]">
-          Uhuul <strong>{customerName}</strong>! Sua{" "}
-          <strong>{product.name}</strong> já está a caminho da sua casa.
+        <p className="text-gray300 text-2xl max-w-[40ch] mb-16">
+          Uhuul <strong>{customerName}</strong>! Sua compra de {products.length}{" "}
+          camisetas já está a caminho da sua casa.
         </p>
         <Link
           href={"/"}
-          className="text-green500 text-xl font-bold mt-auto p-2 hover:text-green300"
+          className="text-green500 text-xl font-bold p-2 hover:text-green300"
         >
           Voltar ao catálogo
         </Link>
@@ -48,8 +57,6 @@ export default function Sucess({ customerName, product }: CheckoutProps) {
     </>
   );
 }
-
-//cs_test_a1W6uyin7zh1oo9VpQ1WfsgyV9FaZSfeBwGuuPKcKsQrGP4yszzNYotdy9
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   if (!query.session_id) {
@@ -65,14 +72,21 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     expand: ["line_items", "line_items.data.price.product"],
   });
   const customerName = session.customer_details?.name;
-  const product = session.line_items?.data[0].price?.product as Stripe.Product;
-  return {
-    props: {
-      customerName,
-      product: {
+  const productsData = session.line_items?.data;
+  if (productsData) {
+    const products = productsData.map((data) => {
+      const product = data.price?.product as Stripe.Product;
+      return {
         name: product.name,
         imageUrl: product.images[0],
+      };
+    });
+    return {
+      props: {
+        customerName,
+        products,
       },
-    },
-  };
+    };
+  }
+  throw new Error();
 };
